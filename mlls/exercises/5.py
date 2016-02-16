@@ -1,7 +1,6 @@
+from sklearn.neighbors import KNeighborsClassifier
 from data_generator import DataGenerator as dg
 import numpy as np
-from classifier import KNN
-from sklearn.neighbors import KNeighborsClassifier
 import matplotlib.pyplot as plt
 
 
@@ -11,12 +10,14 @@ def split_train_test(data, split_num=None, split_ratio=0.7):
 
 
 def main():
-    means = [[0, 0], [1.0, 1.0]]
+    init_means = [0, 1]
+    mean_dimensions = 10
+    means = [[init_mean for mean_dim in range(mean_dimensions)]for init_mean in init_means ]
     knn_models = [3, 5, 10]
     data_sizes = [10, 25, 50, 75, 100, 125, 150, 175, 200]
-    points_per_class = 250
-    data = dg.generate_gaussian_mixture(class_means=means, class_variance=np.eye(2),
-                                        num_components=5, num_desired_points_per_class=points_per_class)
+    points_per_class = 200
+    data = dg.generate_prob_mixture(class_means=means, class_variance=np.eye(len(means[0])), num_components=5,
+                                    num_desired_points=points_per_class, dim_uniform=5)
     class_0 = np.hstack((data[0], np.zeros((len(data[0]), 1))))
     class_1 = np.hstack((data[1], np.ones((len(data[0]), 1))))
     np.random.shuffle(class_0)
@@ -45,5 +46,7 @@ def main():
     plt.plot(data_sizes, results_train[1, :], 'b--')
     plt.plot(data_sizes, results_train[2, :], 'g--')
     plt.show()
+    return
+
 if __name__ == '__main__':
     main()
