@@ -12,9 +12,10 @@ class Classifier:
         """
 
     @abc.abstractmethod
-    def fit(self, train_data, extra_params_dict=None):
+    def fit(self, train_data, labels, extra_params_dict=None):
         """
         :param train_data: Trains the classifier by fitting the train_data
+        :param labels
         :param extra_params_dict: optional extra params that the function might require
         :return: None
         """
@@ -32,14 +33,16 @@ class KNN(Classifier):
 
     __num_neighbors = None
     __train_data = None
+    __labels = None
 
     def __init__(self, num_neighbors):
         super(KNN, self).__init__()
         self.__num_neighbors = num_neighbors
         return
     
-    def fit(self, train_data, extra_params_dict=None):
+    def fit(self, train_data, labels, extra_params_dict=None):
         self.__train_data = train_data
+        self.__labels = labels
         return
 
     def predict(self, test_data, extra_params_dict=None):
@@ -47,24 +50,26 @@ class KNN(Classifier):
 
     def __get_class_prediction(self, instance):
         nbrs = self.__get_nearest_neighbors(instance)
-        return np.bincount(nbrs[:, -1]).argmax()
+        return np.bincount(nbrs).argmax()
 
     def __get_nearest_neighbors(self, instance):
-        euclidean_dist = [np.linalg.norm(curr_element[:2] - instance) for curr_element in self.__train_data]
+        euclidean_dist = [np.linalg.norm(curr_element - instance) for curr_element in self.__train_data]
         sorted_args = np.argsort(euclidean_dist)[:self.__num_neighbors]
-        return np.array([self.__train_data[arg] for arg in sorted_args], np.int32)
+        return np.array([self.__labels[arg] for arg in sorted_args], np.int32)
 
 
 class LinearModel(Classifier):
 
     __weights = None
+    __train_data = None
+    __labels = None
 
     def __init__(self):
         super(LinearModel, self).__init__()
         return
 
-    def fit(self, train_data, extra_params_dict=None):
-        X, Y = np.hstack((np.ones((len(train_data), 1)), train_data[:, :-1])), train_data[:, -1]
+    def fit(self, train_data, labels, extra_params_dict=None):
+        X, Y = train_data, labels
         self.__weights = np.linalg.inv(X.T.dot(X)).dot(X.T.dot(Y))
         return self.__weights
 
