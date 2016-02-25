@@ -10,14 +10,14 @@ class DataGenerator:
         return
 
     @staticmethod
-    def generate_prob_mixture(class_means, class_variance, num_components,
+    def generate_prob_mixture(class_means, class_variances, num_components,
                               num_desired_points, dim_uniform):
         data = []
         uniform_data = None
-        normal_data = DataGenerator.generate_gaussian_mixture(class_means, class_variance, num_components,
+        normal_data = DataGenerator.generate_gaussian_mixture(class_means, class_variances, num_components,
                                                               num_desired_points)
         if dim_uniform > 0:
-            uniform_data = DataGenerator.generate_uniform(-3, 3, range(len(class_means)), num_desired_points, dim_uniform)
+            uniform_data = DataGenerator.generate_uniform(-50, 50, range(len(class_means)), num_desired_points, dim_uniform)
         for i, class_mean in enumerate(class_means):
             if uniform_data is not None:
                 normal_data[i][:, -dim_uniform:] = uniform_data[i]
@@ -25,13 +25,13 @@ class DataGenerator:
         return data
 
     @staticmethod
-    def generate_gaussian_mixture(class_means, class_variance, num_components, num_desired_points_per_class):
+    def generate_gaussian_mixture(class_means, class_variances, num_components, num_desired_points_per_class, seed=42):
         data = []
-        np.random.seed(42)
+        #np.random.seed(seed)
         num_points_per_component = num_desired_points_per_class / num_components
-        for class_num, mean in enumerate(class_means):
-            class_centers = mvn_np(mean, class_variance, num_components)
-            class_data = [mvn_np(class_center, class_variance, num_points_per_component)
+        for class_num, (mean, variance) in enumerate(zip(class_means, class_variances)):
+            class_centers = mvn_np(mean, variance, num_components)
+            class_data = [mvn_np(class_center, variance, num_points_per_component)
                           for class_center in class_centers]
             data.append(np.array(class_data).reshape(num_desired_points_per_class, len(class_means[0])))
         return data

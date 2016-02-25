@@ -16,8 +16,8 @@ def main():
     knn_models = [3, 5, 10]
     data_sizes = [10, 25, 50, 75, 100, 125, 150, 175, 200]
     points_per_class = 200
-    data = dg.generate_prob_mixture(class_means=means, class_variance=np.eye(len(means[0])), num_components=5,
-                                    num_desired_points=points_per_class, dim_uniform=5)
+    data = dg.generate_prob_mixture(class_means=means, class_variances=np.eye(len(means[0])), num_components=5,
+                                    num_desired_points=points_per_class, dim_uniform=2)
     class_0 = np.hstack((data[0], np.zeros((len(data[0]), 1))))
     class_1 = np.hstack((data[1], np.ones((len(data[0]), 1))))
     np.random.shuffle(class_0)

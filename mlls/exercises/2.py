@@ -37,7 +37,7 @@ def calc_posterior(means, data):
             likelihood = mvn_pdf[i].pdf(point_coordinates)
             numerator = likelihood * prior[i]
             normalizer = mvn_pdf[0].pdf(point_coordinates) * prior[0] + mvn_pdf[1].pdf(point_coordinates) * prior[1]
-            posterior[i] += (numerator / normalizer)
+            posterior[i] *= (numerator / normalizer)
     return posterior
 
 

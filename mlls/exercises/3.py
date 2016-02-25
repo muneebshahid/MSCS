@@ -34,7 +34,6 @@ def main():
                                for class_center in class_centers]
         data.extend(class_data)
     data = np.array(data).reshape(200, 3)
-    data = np.hstack((data, np.zeros((200, 1))))
     bias_variance(data, 2)
 
 
