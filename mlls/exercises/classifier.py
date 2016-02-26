@@ -69,15 +69,12 @@ class LinearModel(Classifier):
         return
 
     def fit(self, train_data, labels, extra_params_dict=None):
+        ridge_param = 0 if extra_params_dict is None else extra_params_dict['ridge_param']
         X, Y = train_data, labels
-        self.__weights = np.linalg.inv(X.T.dot(X)).dot(X.T.dot(Y))
+        ridge_matrix = np.eye(np.shape(X.T)[0]).dot(ridge_param)
+        self.__weights = np.linalg.inv(np.add(X.T.dot(X), ridge_matrix)).dot(X.T.dot(Y))
         return self.__weights
 
     def predict(self, test_data, extra_params_dict=None):
-        """
-        :param test_data:
-        :param extra_params_dict: expects threshold as an extra param
-        :return:
-        """
         return np.array([0 if val < extra_params_dict['threshold'] else 1
                          for val in test_data.dot(self.__weights)], np.int32)
